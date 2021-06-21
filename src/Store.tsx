@@ -1,11 +1,36 @@
-import React from 'react';
+import React, { createContext, useReducer } from 'react';
 
-export const Store = React.createContext();
+interface IState {
+	episodes: [];
+	favorites: [];
+}
 
-const initialState = {};
+interface IAction {
+	type: string;
+	payload: any;
+}
 
-function reducer() {}
+const initialState: IState = {
+	episodes: [],
+	favorites: [],
+};
+
+export const Store = createContext<IState | any>(initialState);
+
+function reducer(state: IState, action: IAction): IState {
+	switch (action.type) {
+		case 'FETCH':
+			return { ...state, episodes: action.payload };
+		default:
+			return state;
+	}
+}
 
 export function StoreProvider(props: any): JSX.Element {
-	return <Store.Provider value='test'>{props.children}</Store.Provider>;
+	const [state, dispatch] = useReducer(reducer, initialState);
+	return (
+		<Store.Provider value={{ state, dispatch }}>
+			{props.children}
+		</Store.Provider>
+	);
 }
