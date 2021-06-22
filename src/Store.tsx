@@ -15,8 +15,6 @@ const initialState: IState = {
 	favorites: [],
 };
 
-export const Store = createContext<IState | any>(initialState);
-
 function reducer(state: IState, action: IAction): IState {
 	switch (action.type) {
 		case 'FETCH':
@@ -25,6 +23,8 @@ function reducer(state: IState, action: IAction): IState {
 			return state;
 	}
 }
+
+export const Store = createContext<IState | any>(initialState);
 
 export function StoreProvider(props: any): JSX.Element {
 	const [state, dispatch] = useReducer(reducer, initialState);
