@@ -28,3 +28,9 @@ export interface IEpisode {
 	summary: string;
 	url: string;
 }
+
+export interface IEpisodeProps {
+	episodes: IEpisode[];
+	toggleFavAction: (ep: IEpisode) => IAction;
+	favorites: Array<IEpisode>;
+}

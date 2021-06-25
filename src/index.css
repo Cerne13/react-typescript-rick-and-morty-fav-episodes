@@ -28,3 +28,11 @@ body {
 	position: sticky;
 	top: 0;
 }
+
+.header-links {
+	font-size: 1.5rem;
+}
+
+.header-links .link {
+	margin-right: 20px;
+}
