@@ -1,7 +1,8 @@
 import React, { useContext, useEffect } from 'react';
 
-import { IEpisode, IAction, IEpisodeProps } from './interfaces';
+import { IEpisodeProps } from './interfaces';
 import { Store } from './Store';
+import { fetchDataAction, toggleFavAction } from './Actions';
 
 const EpisodeList = React.lazy<any>(() => import('./EpisodesList'));
 
@@ -9,42 +10,12 @@ export default function HomePage() {
 	const { state, dispatch } = useContext(Store);
 
 	useEffect(() => {
-		state.episodes.length === 0 && fetchDataAction();
+		state.episodes.length === 0 && fetchDataAction(dispatch);
 	});
-
-	const fetchDataAction = async () => {
-		const URL = 'https://api.tvmaze.com/shows/216?&embed=episodes';
-
-		const data = await fetch(URL);
-		const dataJSON = await data.json();
-		return dispatch({
-			type: 'FETCH',
-			payload: dataJSON._embedded.episodes,
-		});
-	};
-
-	const toggleFavAction = (ep: IEpisode): IAction => {
-		const episodeInFav = state.favorites.includes(ep);
-
-		let dispatchObj = {
-			type: 'ADD_FAV',
-			payload: ep,
-		};
-
-		if (episodeInFav) {
-			const favWithoutEpisode = state.favorites.filter(
-				(fav: IEpisode) => fav.id !== ep.id
-			);
-			dispatchObj = {
-				type: 'REMOVE_FAV',
-				payload: favWithoutEpisode,
-			};
-		}
-		return dispatch(dispatchObj);
-	};
 
 	const props: IEpisodeProps = {
 		episodes: state.episodes,
+		store: { state, dispatch },
 		toggleFavAction,
 		favorites: state.favorites,
 	};
