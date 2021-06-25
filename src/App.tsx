@@ -1,34 +1,19 @@
 import React, { useContext, useEffect } from 'react';
 import { Store } from './Store';
+import { IEpisode, IAction } from './interfaces';
 
-interface IEpisode {
-	airdate: string;
-	airstamp: string;
-	airtime: string;
-	id: number;
-	image: {
-		medium: string;
-		original: string;
-	};
-	name: string;
-	number: number;
-	runtime: number;
-	season: number;
-	summary: string;
-	url: string;
-}
+const EpisodeList = React.lazy<any>(() => import('./EpisodesList'));
 
 const App = (): JSX.Element => {
 	const { state, dispatch } = useContext(Store);
-	console.log(state);
+	// console.log(state);
 
 	useEffect(() => {
 		state.episodes.length === 0 && fetchDataAction();
-	}, []);
+	});
 
 	const fetchDataAction = async () => {
-		const URL =
-			'https://api.tvmaze.com/singlesearch/shows?q=rick-&-morty&embed=episodes';
+		const URL = 'https://api.tvmaze.com/shows/216?&embed=episodes';
 
 		const data = await fetch(URL);
 		const dataJSON = await data.json();
@@ -38,30 +23,47 @@ const App = (): JSX.Element => {
 		});
 	};
 
+	const toggleFavAction = (ep: IEpisode): IAction => {
+		const episodeInFav = state.favorites.includes(ep);
+
+		let dispatchObj = {
+			type: 'ADD_FAV',
+			payload: ep,
+		};
+
+		if (episodeInFav) {
+			const favWithoutEpisode = state.favorites.filter(
+				(fav: IEpisode) => fav.id !== ep.id
+			);
+			dispatchObj = {
+				type: 'REMOVE_FAV',
+				payload: favWithoutEpisode,
+			};
+		}
+		return dispatch(dispatchObj);
+	};
+
+	const props = {
+		episodes: state.episodes,
+		toggleFavAction,
+		favorites: state.favorites,
+	};
+
 	return (
 		<>
-			{console.log(state)}
 			<header className='header'>
-				<h1>Rick and Morty</h1>
-				<p>Pick your favourite episode!</p>
+				<div>
+					<h1>Rick and Morty</h1>
+					<p>Pick your favourite episode!</p>
+				</div>
+				<div>Number of faved episodes: {state.favorites.length}</div>
 			</header>
 
-			<section className='episode-layout'>
-				{state.episodes.map((ep: IEpisode) => {
-					return (
-						<section key={ep.id} className='episode-box'>
-							<img
-								src={ep.image.medium}
-								alt={`Rick and Morty ${ep.name}`}
-							/>
-							<div>{ep.name}</div>
-							<section>
-								Season: {ep.season} Episode: {ep.number}
-							</section>
-						</section>
-					);
-				})}
-			</section>
+			<React.Suspense fallback={<div>Loading...</div>}>
+				<section className='episode-layout'>
+					<EpisodeList {...props} />
+				</section>
+			</React.Suspense>
 		</>
 	);
 };
