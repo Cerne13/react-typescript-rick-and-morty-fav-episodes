@@ -2,7 +2,6 @@
  * Here are all the used TS interfaces
  */
 
-export type Dispatch = React.Dispatch<IAction>;
 export interface IState {
 	episodes: Array<IEpisode>;
 	favorites: Array<IEpisode>;
@@ -10,7 +9,7 @@ export interface IState {
 
 export interface IAction {
 	type: string;
-	payload: Array<IEpisode>;
+	payload: any;
 }
 
 export interface IEpisode {
@@ -32,7 +31,7 @@ export interface IEpisode {
 
 export interface IEpisodeProps {
 	episodes: IEpisode[];
-	store: { state: IState; dispatch: Dispatch };
+	store: { state: IState; dispatch: any };
 	toggleFavAction: (state: IState, dispatch: any, ep: IEpisode) => IAction;
 	favorites: Array<IEpisode>;
 }
